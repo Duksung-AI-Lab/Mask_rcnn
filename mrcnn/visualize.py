@@ -20,6 +20,8 @@ from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
+from skimage import io
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 
@@ -79,8 +81,8 @@ def apply_mask(image, mask, color, alpha=0.5):
                                   image[:, :, c])
     return image
 
-
-def display_instances(image, boxes, masks, class_ids, class_names,
+##
+def display_instances(image, boxes, masks, class_ids, class_names, image_file_name,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
@@ -144,7 +146,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         else:
             caption = captions[i]
         ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+                color='black', size=40, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -163,9 +165,43 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
+    detect_file_name = "/content/gdrive/MyDrive/Study/MaskRCNN/samples/clothes/detect_result/detect_{}.jpg".format(image_file_name)
+    plt.savefig(detect_file_name, bbox_inches="tight")
+
+    # crop
+    def get_width(xy):
+        width = abs(xy[1] - xy[3])
+        return width
+
+    def get_height(xy):
+        height = abs(xy[0] - xy[2])
+        return height
+
+    def get_area(xy):
+        width = get_width(xy)
+        height = get_height(xy)
+        area = width * height
+        return area
+
+    def get_biggest_box(xy_list):
+        biggest_area = 0
+        global biggest_xy
+        for i, xy in enumerate(xy_list):
+            area = get_area(xy)
+            if area > biggest_area:
+                biggest_area = area
+                biggest_xy = xy
+        return biggest_xy
+
+    big_box = get_biggest_box(boxes)
+    x, y, width, height = big_box 
+
+    crop_img = image[x:width, y:height]
+    crop_file_name = "/content/gdrive/MyDrive/Study/MaskRCNN/samples/clothes/crop_result/crop_{}.jpg".format(image_file_name)
+    io.imsave(crop_file_name, crop_img)
+
     if auto_show:
         plt.show()
-
 
 def display_differences(image,
                         gt_box, gt_class_id, gt_mask,
