@@ -1,6 +1,7 @@
 ## Mask_RCNN 중 수정한 곳
 + mrcnn 폴더 내 visualize.py 수정
 + samples 폴더 내 clothes 폴더 생성 후 clothes 폴더 내에 데이터 셋 폴더와 clothes.py를 추가
++ 데이터 셋은 너무 커서 깃허브에 업로드 불가 (코드 사용시 로컬에서 데이터셋을 준비한 후 사용)
 
 ## Mask_RCNN 사용법 (Colab 기준)
 1. Mask_RCNN git clone 하기
